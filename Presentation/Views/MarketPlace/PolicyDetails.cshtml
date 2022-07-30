@@ -1,0 +1,41 @@
+﻿@{
+
+    Layout = "_TestLayout";
+}
+@model Presentation.Models.policydetails.Result
+<div class="row flex-lg-nowrap">
+    <div class="col mb-3">
+        <div class="e-panel card">
+            <div class="card-body">
+                <div class="card-title">
+                    <h6 class="mr-2"><span>Renew Your Policy</span><small class="px-1"></small></h6>
+                </div>
+                <div class="e-table">
+                    <div class="table-responsive table-lg mt-3">
+                        
+                            <table class="table table-bordered">
+                               
+                                <tbody>
+
+                                    <tr>
+
+                                        <td class="text-nowrap align-middle">
+                                            FirstName : @Model.firstName <br /> <br />
+                                            LastName : @Model.lastName <br /> <br />
+                                            Start Date : @Model.policyStartDate <br /> <br />
+                                            End Date : @Model.policyEndDate <br /> <br />
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                          
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div>
+

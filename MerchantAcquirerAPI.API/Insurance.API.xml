@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MerchantAcquirerAPI.API</name>
+    </assembly>
+    <members>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.CountryController.AddUpdateCountry(MerchantAcquirerAPI.Services.Country.DTO.CountryDTO)">
+            <summary>
+             API for creating and updating country
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.CountryController.GetAllCountries(MerchantAcquirerAPI.Data.Payload.CountryFilter)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.CountryController.GetCountryById(System.Int64,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="Id"></param>
+            <param name="CheckDeleted"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.DataController.DataPricingLookUp(MerchantAcquirerAPI.Services.Telecom.DTO.BundleRequestPayload)">
+            <summary>
+            The code and allowanace from lookup are not always the same. The code indicates the product's code while the allowanace indicates the bundle purchased.
+            The "network" can be "MTN", "GLO", "AIRTEL", "9mobile"
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.DealerController.RegisterDealer(MerchantAcquirerAPI.Services.Dealer.DTO.DealerDTO)">
+            <summary>
+             API for registering, approving and creating dealers
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.EmailTemplateController.AddEmailTemplate(MerchantAcquirerAPI.Services.Emailing.DTO.EmailTemplateViewModel)">
+            <summary>
+             API for creating and updating email template
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.EmailTemplateController.GetAllCountries(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.EmailTemplateController.GetEmailTemplateById(System.Int64,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="Id"></param>
+            <param name="CheckDeleted"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.FAQsController.AddUpdateQuestionAndAnswer(MerchantAcquirerAPI.Services.FAQsDTO.DTO.NotificationLogDTO)">
+            <summary>
+             API for creating and updating country
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.FAQsController.GetAllQuestionAndAnswers(MerchantAcquirerAPI.Data.Payload.FAQsFilter)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductCommisionController.AddUpdateProductCommission(MerchantAcquirerAPI.Services.Product.DTO.ProductCommission)">
+            <summary>
+             API for creating and updating Product
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductCommisionController.GetAllProductServiceCommission(MerchantAcquirerAPI.Data.Payload.ProductCommisionFilter)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductCommisionController.GetProductServiceById(System.Int64,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="Id"></param>
+            <param name="CheckDeleted"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductCommisionSuperDealerController.AddUpdateProductCommission(MerchantAcquirerAPI.Services.ProductServiceCommissionSuperDealer.Dto.ProductServiceCommissionDto)">
+            <summary>
+             API for creating and updating Product
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductCommisionSuperDealerController.GetAllProductServiceCommission(MerchantAcquirerAPI.Data.Payload.ProductServiceCommissionSuperDealerFilter)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductCommisionSuperDealerController.GetProductServiceById(System.Int64,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="Id"></param>
+            <param name="CheckDeleted"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductController.AddUpdateProduct(MerchantAcquirerAPI.Services.Product.DTO.ProductDto)">
+            <summary>
+             API for creating and updating Product
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductController.GetAllProduct(MerchantAcquirerAPI.Data.Payload.ProductFilter)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductController.GetProductById(System.Int64,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="Id"></param>
+            <param name="CheckDeleted"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductServicesController.AddUpdateProduct(MerchantAcquirerAPI.Services.Product.DTO.ProductServiceDto)">
+            <summary>
+             API for creating and updating Product
+            </summary>
+            <param name="payload"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductServicesController.GetAllProductService(MerchantAcquirerAPI.Data.Payload.ProductServiceFilter)">
+            <summary>
+            
+            </summary>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MerchantAcquirerAPI.API.Controllers.ProductServicesController.GetProductServiceById(System.Int64,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="Id"></param>
+            <param name="CheckDeleted"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,177 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "_TestLayout";
+}
+@model List<Presentation.Models.DynamicFormField>
+<div class="row flex-lg-nowrap">
+    <div class="col mb-3">
+        <div class="e-panel card">
+            <div class="card-body">
+                <div class="card-title">
+                    <h6 class="mr-2">Sign on for @ViewBag.Description Policy</h6>
+                </div>
+                <div class="e-table">
+                    <div class="table-responsive table-lg mt-3">
+
+                        <form asp-action="ProcessPolicy" asp-controller="MarketPlace" method="post" novalidate>
+                            @foreach (var item in Model)
+                            {
+                                string typeProperty = "text";
+
+                                if (item.Name.Contains("DOB") || item.Name.Contains("DateofBirth"))
+                                {
+                                    typeProperty = "date";
+                                }
+
+                                @if (item.Name == "StateofResidence")
+                                {
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">State of Residence</label>
+                                        <select asp-for="@item.Name" required class="form-control" id="@item.Name" name="@item.Name" asp-items="@ViewBag.StateofResidence">
+                                            <option value="-1">Select State</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Local Government</label>
+                                        <select class="form-control" id="LGA" name="LGA">
+                                            <option value="-1">Select  Local Government</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Preferred Hospital</label>
+                                        <select class="form-control" id="PreferredHospital" name="PreferredHospital">
+                                            <option value="-1">Select  Preferred Hospital</option>
+                                        </select>
+                                    </div>
+
+
+
+                                }
+                                else if (item.Name == "Gender")
+                                {<div class="form-group">
+                                        <label for="exampleInputEmail1">Gender</label>
+                                        <select class="form-control" id="Gender" name="Gender">
+                                            <option value="-1">Select  Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+
+                                }
+                                else if (item.Name == "PreferredHospital" || item.Name == "LGA" || item.Name == "Gender" || item.Name == "StateofResidence")
+                                {
+
+                                }
+                                else
+                                {
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">@item.Name</label>
+                            @if (item.Name.Contains("DateofBirth"))
+                            {
+                                <input type="@typeProperty" asp-for="@item.Name" required class="form-control" data-date-format="YYYY/MM/DD" id="@item.Name" name="@item.Name">
+
+                            }
+                            else
+                            {
+
+                                <input type="@typeProperty" asp-for="@item.Name" required class="form-control" id="@item.Name" name="@item.Name" value="" />
+                            }
+                        </div>
+                                }
+                            }
+                            <input type="hidden" name="PartnerCode" id="PartnerCode" value="@ViewBag.PartnerCode" />
+                            <input type="hidden" name="ProductCode" id="ProductCode" value="@ViewBag.ProductCode" />
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script>
+    $(document).ready(function () {
+
+
+
+        //State details by country id
+
+        $("#StateofResidence").change(function () {
+            var e = document.getElementById("StateofResidence");
+            var StateName = e.value;
+
+            if (!isNaN(StateName)) {
+                var ddlState = $('#LGA');
+                ddlState.empty();
+                ddlState.append($("<option></option>").val('').html('Please wait ...'));
+
+                debugger;
+                $.ajax({
+                    url: 'BindLgaDetails',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { StateName: StateName },
+                    success: function (d) {
+
+                        ddlState.empty(); // Clear the please wait
+                        ddlState.append($("<option></option>").val('').html('Select Local Government'));
+                        $.each(d, function (i, states) {
+                            ddlState.append($("<option></option>").val(states.LGAName).html(states.LGAName));
+                        });
+                    },
+                    error: function () {
+                        alert('Error!');
+                    }
+                });
+            }
+
+
+        });
+
+       // bind hospital
+        $("#LGA").change(function () {
+            var e = document.getElementById("LGA");
+
+            var eState = document.getElementById("StateofResidence");
+            var LocalGovernment = e.value;
+            debugger
+            if (LocalGovernment!= "") {
+
+                debugger
+                var ddlPreferredHospital = $('#PreferredHospital');
+                ddlPreferredHospital.empty();
+                ddlPreferredHospital.append($("<option></option>").val('').html('Please wait ...'));
+
+                debugger;
+                $.ajax({
+                    url: 'BindHospitalDetails',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { StateName: eState.value, LocalGovernment: LocalGovernment, ProductCode: '@ViewBag.ProductCode'},
+                    success: function (d) {
+
+                        ddlPreferredHospital.empty(); // Clear the please wait
+                        ddlPreferredHospital.append($("<option></option>").val('').html('Select Hospital'));
+                        $.each(d, function (i, PreferredHospitals) {
+                            ddlPreferredHospital.append($("<option></option>").val(PreferredHospitals.name).html(PreferredHospitals.name));
+                        });
+                    },
+                    error: function () {
+                        alert('Error!');
+                    }
+                });
+            }
+
+
+        });
+
+    });
+</script>
