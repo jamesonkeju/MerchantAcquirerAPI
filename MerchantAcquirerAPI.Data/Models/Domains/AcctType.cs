@@ -10,7 +10,7 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
     public class AcctType
     {
         [Key]
-        public int Acctcode { get; set; }
+        public string Acctcode { get; set; }
         public string AcctDesc { get; set; }
     }
 }

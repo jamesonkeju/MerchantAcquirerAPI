@@ -11,9 +11,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
         public bool HasError { get; set; } = false;
         public string Message { get; set; }
         public string StatusCode { get; set; }
-        public string Token { get; set; }
-        public string UserID { get; set; }
-        public bool IsSuccessful { get; set; } = false;
         public T Result { get; set; }
 
     }

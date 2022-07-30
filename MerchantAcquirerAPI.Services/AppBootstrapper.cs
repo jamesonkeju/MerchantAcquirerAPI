@@ -4,6 +4,8 @@ using MerchantAcquirerAPI.Data;
 using MerchantAcquirerAPI.Services.AuditLog.Concrete;
 using MerchantAcquirerAPI.Services.CommonRoute;
 using MerchantAcquirerAPI.Services.CommonRoute.concrete;
+using MerchantAcquirerAPI.Services.AccountType.Interface;
+using MerchantAcquirerAPI.Services.AccountType.Concrete;
 
 namespace MerchantAcquirerAPI.Services
 {
@@ -27,7 +29,8 @@ namespace MerchantAcquirerAPI.Services
             services.AddTransient(typeof(DbContextOptions<MerchantAcquirerAPIAppContext>));
             services.AddTransient<IActivityLog, ActivityLogServices>(); 
             services.AddTransient<ICommonRoute, CommonRouteServices>();
-          
+            services.AddTransient<IAccountType, AccountTypeServices>();
+
         }
 
 

@@ -45,7 +45,7 @@ namespace MerchantAcquirerAPI.API.Controllers
         {
             var jwt_token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-            var resp = new ApiResult<ApplicationSession> { IsSuccessful = false, Message = "Unable to token!" };
+            var resp = new ApiResult<ApplicationSession> { HasError = false, Message = "Unable to token!" };
 
             if (string.IsNullOrWhiteSpace(jwt_token)) return resp;
 

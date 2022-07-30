@@ -328,6 +328,10 @@ namespace MerchantAcquirerAPI.Utilities.Common
         public const string Failed = "300";
 
         public const int PermissionParentId = 0;
+
+        public const string MobileFailed = "400";
+        public const string MobileSuccessful = "200";
+        public const string MobileMessageNoRecord = "No record was found.";
     }
 
 
