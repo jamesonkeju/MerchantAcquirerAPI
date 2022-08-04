@@ -6,6 +6,12 @@ using MerchantAcquirerAPI.Services.CommonRoute;
 using MerchantAcquirerAPI.Services.CommonRoute.concrete;
 using MerchantAcquirerAPI.Services.AccountType.Interface;
 using MerchantAcquirerAPI.Services.AccountType.Concrete;
+using MerchantAcquirerAPI.Services.BusinessCategory.Interface;
+using MerchantAcquirerAPI.Services.Terminal.Concrete;
+using MerchantAcquirerAPI.Services.Terminal.Interface;
+using MerchantAcquirerAPI.Services.BusinessCategory.Concrete;
+using MerchantAcquirerAPI.Services.CustomerRequest.Interface;
+using MerchantAcquirerAPI.Services.CustomerRequest.Concrete;
 
 namespace MerchantAcquirerAPI.Services
 {
@@ -30,7 +36,9 @@ namespace MerchantAcquirerAPI.Services
             services.AddTransient<IActivityLog, ActivityLogServices>(); 
             services.AddTransient<ICommonRoute, CommonRouteServices>();
             services.AddTransient<IAccountType, AccountTypeServices>();
-
+            services.AddTransient<IBusinessCategory, BusinessOccupationsServices>();
+            services.AddTransient<ITerminal, TerminalServices>();
+            services.AddTransient<ICustomerRequest, CustomerRequestServices>();
         }
 
 

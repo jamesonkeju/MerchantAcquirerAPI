@@ -137,6 +137,8 @@ namespace MerchantAcquirerAPI.Data
         public DbSet<TerminalModel> TerminalModel { get; set; }
         public DbSet<TerminalOwner> TerminalOwner { get; set; }
         public DbSet<UserInfo> UserInfo { get; set; }
+
+        public DbSet<RequestStatus> RequestStatus { get; set; }
         #endregion
 
 
