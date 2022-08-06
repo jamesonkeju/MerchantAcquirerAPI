@@ -1,0 +1,52 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="OutsideMail.aspx.cs" Inherits="NewProject.HtmlDoc.OutsideMail" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    
+    <link href="../Css/myadmin.css" rel="stylesheet" type="text/css" />
+    <link href="../Css/Main.css" rel="stylesheet" type="text/css" />
+    
+    <link href="../Css/UpdateProgress.css" rel="stylesheet" type="text/css" />
+    </head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+    <table width="100%" border="0" cellspacing="2" cellpadding="2" class="table table-striped table-bordered table-hover">
+  <tr>
+    <td><strong>NEW POS REQUEST AWAITING CONFIGURATION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+        Date: {date}</strong></td>
+  </tr>
+  <tr>
+    <td>Dear<strong> Team </strong>,&nbsp;</td>
+  </tr>
+  <tr>
+    <td><br>
+      This is to inform you that the POS Details below has been assigned to you for Configuration. We are currently uploading these request to NIBBS Server. The details are as follows : </td>
+   </tr>
+</table>
+
+    <div>
+    {content}
+    </div>
+ 
+ <table class="table table-striped table-bordered table-hover">
+  <tr>
+    <td><p class="bodyText">Best Regards,</p>
+      </td>
+  </tr>
+  
+  <tr>
+    <td><strong>
+        <br />
+        EcoBank Bank Plc<br />
+        </strong></td>
+  </tr>
+  
+  </table>
+</div>
+    </form>
+</body>
+</html>

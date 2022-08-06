@@ -316,9 +316,9 @@ namespace MerchantAcquirerAPI.Utilities.Common
             }
             return ret;
         }
-      
 
-       
+     
+
         public CustomerDetail ValidateAccount_Old(string acctno)
         {
             CustomerDetail cust = new CustomerDetail();
@@ -398,11 +398,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
         }
 
         
-
-        
-
-
-
         public string GetProperty(SearchResult searchResult, string PropertyName)
         {
             if (searchResult.Properties.Contains(PropertyName))
@@ -447,40 +442,13 @@ namespace MerchantAcquirerAPI.Utilities.Common
         }
 
 
-
-
-
         // Check Head of Operation
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         public string uniqueid()
         {
             return DateTime.Now.ToString("yyyyMMddHHmmssFFF");
         }
-
-
-
-
-
-      
-
-
-        
-
-    
-
 
 
 
@@ -546,9 +514,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
             return firstDayOfTheMonth.AddMonths(1).AddDays(-1);
         }
 
-
-
-
         public bool isValidNumber(int k)
         {
             bool flag = false;
@@ -570,12 +535,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
 
             return flag;
         }
-
-      
-
-     
-
-
         public DataTable GetCardInfo(string acctno)
         {
             DataTable cust = new DataTable();
@@ -614,10 +573,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
 
             return cust;
         }
-
-
-
-
         public string generateQrCodeString(string AccountPan, string MerchantName, string MCCCode, string MerchantCity
            )
         {
@@ -647,8 +602,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
             }
         }
 
-
-
         public static string GetCRC(string inputStr)
         {
             int polynomial = 0x1021;
@@ -677,14 +630,7 @@ namespace MerchantAcquirerAPI.Utilities.Common
             crc &= 0xFFFF;
             return crc.ToString("X");
         }
-
-       
-
-    
-     
-
-        
-
+   
         public string getDefaultEmail(string inputEmail)
         {
             try
@@ -712,8 +658,6 @@ namespace MerchantAcquirerAPI.Utilities.Common
                 return "False";
             }
         }
-
-
         public string getDefaultPhone(string inputPhone)
         {
             try

@@ -11,7 +11,7 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
 	{
 		[Key]
 		public long ReqID { get; set; }
-		public DateTime ReqDate { get; set; }
+		public DateTime? ReqDate { get; set; }
 		public string UserId { get; set; }
 		public string AcctNo { get; set; }
 		public string AccountClass { get; set; }
@@ -36,10 +36,10 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
 		public string AcctMerchantNameFlag { get; set; }
 		public string AcctMNameReason { get; set; }
 		public int ReqStatId { get; set; }
-		public DateTime ReqAcceptDate { get; set; }
+		public DateTime? ReqAcceptDate { get; set; }
 		public string ReqAcceptedBy { get; set; }
 		public string ReqBranch { get; set; }
-		public DateTime ReqDeclinedDate { get; set; }
+		public DateTime? ReqDeclinedDate { get; set; }
 		public string ReqDeclinedBy { get; set; }
 		public string LGA { get; set; }
 		public string MerchantURL { get; set; }
@@ -55,17 +55,17 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
 		public string CustID { get; set; }
 		public string EbizProcessor { get; set; }
 		public string EbizAction { get; set; }
-		public DateTime EbizDateReview { get; set; }
+		public DateTime? EbizDateReview { get; set; }
 		public string EbizComment { get; set; }
 		public string PTSP { get; set; }
-		public DateTime DateDownloaded { get; set; }
+		public DateTime? DateDownloaded { get; set; }
 		public string DownloadedBy { get; set; }
 		public string AcknowledgedBy { get; set; }
-		public DateTime AknowledgedDate { get; set; }
+		public DateTime? AknowledgedDate { get; set; }
 		public int DaysInterval { get; set; }
-		public DateTime ReqProfilingDate { get; set; }
+		public DateTime? ReqProfilingDate { get; set; }
 		public int ProfilingStatus { get; set; }
-		public DateTime profillingDate { get; set; }
+		public DateTime? profillingDate { get; set; }
 		public string profilingBy { get; set; }
 		public string BatchAkw { get; set; }
 		public string AltPhone { get; set; }

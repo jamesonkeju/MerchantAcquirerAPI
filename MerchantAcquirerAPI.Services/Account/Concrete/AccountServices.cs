@@ -14,6 +14,8 @@ using MerchantAcquirerAPI.Services.Account.Interface;
 using MerchantAcquirerAPI.Services.AuditLog.Concrete;
 using MerchantAcquirerAPI.Services.DataAccess;
 using MerchantAcquirerAPI.Utilities.Common;
+using MerchantAcquirerAPI.Data.Models.ViewModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace MerchantAcquirerAPI.Services.Account.Concrete
 {
@@ -28,6 +30,7 @@ namespace MerchantAcquirerAPI.Services.Account.Concrete
         private readonly IActivityLog _activityRepo;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        
         public AccountServices(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager, IConfiguration configuration,
@@ -45,98 +48,57 @@ namespace MerchantAcquirerAPI.Services.Account.Concrete
             _httpContextAccessor = httpContextAccessor;
         }
 
-          public Task<MessageOut> Register(AdminUserSettingViewModel payload)
+
+        public async Task<ApiResult<Utilities.LDAPModel.CustomerDetail>> AccountValidation(string AccountNo)
         {
-            throw new NotImplementedException();
-        }
-
-        #region Seceret
-    
-        private async Task PrepareSignInClaims(ApplicationUser user)
-        {
-
-            var userClaims = await _userManager.GetClaimsAsync(user);
-
-            var _claims = userClaims.ToList();
-            string roles = string.Empty;
-            IList<string> role = await _userManager.GetRolesAsync(user);
-
-           
-            string USERPERMISSION = SetUserPermissions(user.Id);
-
-            var RoleName = await _roleManager.FindByIdAsync(user.RoleId);
-
-
-            var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Name, user.FirstName + ' '  + user.LastName),
-                            new Claim(ClaimTypes.Email, user.Email),
-                            new Claim(ClaimTypes.Role, RoleName.Name),
-                            new Claim(ClaimTypes.Surname, user.LastName),
-                            new Claim(ClaimTypes.MobilePhone, user.MobileNumber),
-                            new Claim(ClaimTypes.GivenName, user.FirstName + ' '  + user.LastName),
-                            new Claim(ClaimTypes.Anonymous, RoleName.RoleName),
-                            new Claim(ClaimTypes.PostalCode, RoleName.Id)
-
-                        }.Union(userClaims);
-
-            foreach (var r in role)
-            {
-                claims = claims.Append(new Claim(ClaimTypes.Role, r));
-            }
-
-            _claims = claims.ToList();
-
-        
-            await _signInManager.SignInWithClaimsAsync(user, false, _claims);
-        }
-
-        private string SetUserPermissions(string UserId)
-        {
+            var customerInfo = new Utilities.LDAPModel.CustomerDetail();
+            var msg = new ApiResult<Utilities.LDAPModel.CustomerDetail>();
             try
             {
 
-                AccessDataLayer accessDataLayer = new AccessDataLayer(_context);
-                DBManager dBManager = new DBManager(_context);
-
-                var parameters = new List<IDbDataParameter>();
-
-                parameters.Add(dBManager.CreateParameter("@UserId", UserId, DbType.String));
-                DataTable mUserPremissionRolemodel = accessDataLayer.FetchUserPermissionAndRole(parameters.ToArray(), "FetchUserPermissionAndRole");
-
-
-
-                string userPermissions = "";
-                if (mUserPremissionRolemodel != null)
+                if (AccountNo == "" || AccountNo == null)
                 {
-                    int i = 0;
-                    foreach (DataRow item in mUserPremissionRolemodel.Rows)
-                    {
-                        i = i + 1;
-                        if (i == 0)
-                        {
-                            userPermissions = item["PermissionCode"] + ",";
-                        }
-                        else
-                        {
-                            userPermissions = userPermissions + item["PermissionCode"].ToString() + ",";
-                        }
-                    }
+                    msg.HasError = true;
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = "Account Number is a required field. Please supply Merchant Account Number";
+                    return msg;
                 }
-                return userPermissions;
+
+
+                // validate the account 
+
+                Utilities.Common.LDAP lp = new LDAP(_configuration);
+
+                customerInfo = lp.ValidateAccount_Old(AccountNo);
+
+                if (customerInfo.CustomerName == "Error")
+                {
+                    msg.HasError = true;
+                    msg.Message = "Account Cannot be Validated at the moment!!";
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Result = customerInfo;
+                }
+                else
+                {
+                    msg.HasError = false;
+                    msg.Message = CommonResponseMessage.FetchSuccessMessage;
+                    msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                    msg.Result = customerInfo;
+                }
+                return msg;
+
+
             }
             catch (Exception ex)
             {
-                //  _log.Error(ex);
-                return string.Empty;
+
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
             }
         }
 
-        public Task<MessageOut> Login(UserLoginPayload payload)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+     
     }
 }

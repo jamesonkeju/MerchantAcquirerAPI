@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MerchantAcquirerAPI.Services.AccountType.Interface
 {
-    public interface  IAccountType
+    public interface IAccountType
     {
         Task<ApiResult<List<Data.Models.Domains.AcctType>>> GetAccountTypes();
     }

@@ -12,7 +12,7 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
        [Key]
         public string MccCode { get; set; }
         public string MccName { get; set; }
-        public DateTime DateLastUpdated { get; set; }
+        public DateTime? DateLastUpdated { get; set; }
         public string updatedby { get; set; }
 
     }

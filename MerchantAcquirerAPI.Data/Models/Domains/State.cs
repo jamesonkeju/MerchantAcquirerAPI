@@ -14,23 +14,25 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
         public string StateName { get; set; }
         public string StateCode { get; set; }
         public string Capital { get; set; }
-        public DateTime DateLastUpdated { get; set; }
-        public string UpdatedBy { get; set; }
-        public string PTSP_Primary { get; set; }
 
-        public string PTSP_Secondary { get; set; }
-        public string ostCode { get; set; }
+        public DateTime? DateLastUpdated { get; set; }
+        public string? UpdatedBy { get; set; }
+        public string? PTSP_Primary { get; set; }
+
+        public string? PTSP_Secondary { get; set; }
+        public string? PostCode { get; set; }
 
     }
 
-    public class Lga 
+  
+        public class Lga 
     {
         [Key]
-        public string sn { get; set; }
+        public int sn { get; set; }
         public string StateName { get; set; }
         public string LGA { get; set; }
-        public string UpdatedBy { get; set; }
-        public string DateUpdated { get; set; }
+        public string? UpdatedBy { get; set; }
+        public string? DateUpdated { get; set; }
 
     }
 }

@@ -1,15 +1,21 @@
 ﻿using MerchantAcquirerAPI.Data;
+using MerchantAcquirerAPI.Data.Models.Domains;
 using MerchantAcquirerAPI.Services.AccountType.Interface;
 using MerchantAcquirerAPI.Services.AuditLog.Concrete;
 using MerchantAcquirerAPI.Services.CommonRoute;
 using MerchantAcquirerAPI.Services.CustomerRequest.dto;
 using MerchantAcquirerAPI.Services.CustomerRequest.Interface;
+using MerchantAcquirerAPI.Services.DataAccess;
+using MerchantAcquirerAPI.Services.FileHandler;
 using MerchantAcquirerAPI.Services.Terminal.Interface;
 using MerchantAcquirerAPI.Utilities.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,14 +28,270 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
         private IActivityLog _activityLogService;
         private ILogger<CustomerRequestServices> _logger;
         private ICommonRoute _commonServices;
-        public CustomerRequestServices(MerchantAcquirerAPIAppContext context, ILogger<CustomerRequestServices> logger, IActivityLog activityLogService, ICommonRoute commonServices)
+        private IFileHandler _fileHandler;
+        private IConfiguration _configuration;
+        public CustomerRequestServices(MerchantAcquirerAPIAppContext context, ILogger<CustomerRequestServices> logger,
+            IActivityLog activityLogService, ICommonRoute commonServices, IFileHandler fileHandler, IConfiguration configuration )
         {
             _context = context;
             _activityLogService = activityLogService;
             _logger = logger;
             _commonServices = commonServices;
+            _fileHandler = fileHandler;
+            _configuration = configuration;
         }
 
+
+        public async Task<ApiResult<string>> GetNewMID(string AccountNo, string address)
+        {
+
+            var msg = new ApiResult<string>();
+            string temp = "";
+
+            try
+            {
+
+                if (AccountNo == "")
+                {
+                    msg.HasError = true;
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = "Account Number is a required field. Please supply Merchant Account Number";
+                    return msg;
+                }
+
+                if (address == "")
+                {
+                    msg.HasError = true;
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = "Account address is a required field. Please supply Merchant address";
+                    return msg;
+                }
+
+
+                var getRequest = await _context.PosReq.Where(a => a.AcctNo == AccountNo && a.PhyAddress == address).FirstOrDefaultAsync();
+
+                if (getRequest != null)
+                {
+
+                    temp = getRequest.MerchantID;
+
+                }
+                else
+                {
+
+                    var rstep = await _context.MerchantIDTab.FirstOrDefaultAsync();
+
+                    int lastid = Convert.ToInt32(rstep.LastMid);
+                    int newid = lastid + 1;
+
+
+                    // Update last record
+                    rstep.LastMid = newid.ToString();
+                    rstep.DateLastGen = DateTime.Now;
+                    await _context.SaveChangesAsync();
+
+
+                    string bracode = AccountNo.Substring(0, 3);
+                    string prefix = _configuration["Midprefix"];
+                    string remx = newid.ToString().PadLeft(9, '0');
+
+                    temp = prefix + bracode + remx;
+
+                }
+
+                msg.HasError = false;
+                msg.Message = "Record Saved Successful";
+                msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                msg.Result = temp;
+                return msg;
+
+
+            }
+            catch (Exception ex)
+            {
+
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
+            }
+        }
+
+        public async Task<ApiResult<POSRequestResponse>> CreatePOSRequest(POSRequest payload, string AppFileName, string AcceptanceFileName)
+        {
+            string TransactionRef = GenericUtil.uniqueid();
+            var msg = new ApiResult<POSRequestResponse>();
+            LDAP lp = new LDAP(_configuration);
+
+            var data = new POSRequestResponse();
+            try
+            {
+
+                // what do we need to check to ensure it not a duplicate 
+                var newreq = new PosReq();
+              
+                newreq.AcctNo = payload.AccountNumber;
+                newreq.AcctName = payload.AccountName;
+                newreq.ContactName = payload.ContactName;
+                newreq.MerchantEmail = payload.MerchantEmail;
+                newreq.PTSP = "";
+                newreq.ContactTitle = payload.ContactTitle;
+                newreq.AcctType = payload.AccountType;
+                newreq.BankCode = _configuration["BankCode"];
+                newreq.BusOcpCode =payload.BusinessOccupation;
+                newreq.MccCode = payload.MccType;
+                newreq.StateCode = payload.StateCode;
+                newreq.TermOwnerCode = payload.TermOwnerCode;
+                newreq.TermCode = payload.TermCode;
+                newreq.ReqDate = DateTime.Now;
+                newreq.ReqBranch = _configuration["Branch"];
+                newreq.ReqStatId = 1;
+                newreq.SlipHeader = payload.MerchantAddress;
+                newreq.UserId = _configuration["userId"];
+                newreq.PhyAddress = payload.PhysicalAddress;
+                newreq.MobilePhone = payload.ContactPhone;
+                newreq.MerchantURL = payload.MerchantURL;
+                newreq.AcctBranch = payload.AccountBranch;
+                newreq.MandateAttach = "Yes";
+                newreq.ROId = _configuration["ROId"];
+                newreq.Reminder = 0;
+                newreq.Sec_contactName = payload.SecondaryContactName;
+                newreq.Sec_contact_mobile = payload.SecondaryContactPhone;
+                newreq.Network_Operator = payload.SecondaryNetworkOperator;
+                newreq.Sec_Network = payload.PreferedTerminalNetwork;
+                newreq.Sec_Operator = payload.PreferedNetworkOperator;
+                newreq.MerchantName = payload.MerchantName;
+                newreq.MasterPassHolder = "No";
+                newreq.NibbsUSSDHolder = "No";
+
+                newreq.NetworkType = payload.PreferedTerminalNetwork;
+
+                if (payload.AccountSegment.Length >= 50)
+                {
+                    newreq.AccountClass = payload.AccountSegment.Substring(0, 47);
+                }
+                else
+                {
+                    newreq.AccountClass = payload.AccountSegment;
+                }
+
+                if (payload.MerchantAlternatePhone == string.Empty)
+                {
+                    newreq.AltPhone = "NIL";
+                }
+                else
+                {
+                    newreq.AltPhone = payload.MerchantAlternatePhone;
+                }
+
+
+                // Assign FileName to db field
+                newreq.ApplicationForm1 = AppFileName;
+                newreq.ApplicationForm2 = AcceptanceFileName;
+
+                string path1 = _configuration["xxxx"] + AppFileName;
+                string path2 = _configuration["xxxx"] + AcceptanceFileName;
+
+                newreq.SiteVisitationDoc = "";
+                newreq.AgreementDoc = "";
+                newreq.LGA = payload.LocalGovernmentArea;
+                newreq.ReqCode = TransactionRef;
+                newreq.EmailAlerts = payload.ReceiveEmailAlerts == true ? "Y" : "N";
+                newreq.CustID = payload.CustomerID;
+
+                var  mcid = await GetNewMID(payload.AccountNumber,payload.PhysicalAddress);
+
+                newreq.MerchantID = mcid.Result.Trim();
+
+                newreq.ProfilingStatus = 2;
+                newreq.Path1 = path1;
+                newreq.Path2 = path2;
+
+
+                //Confirm if Merchant ID Already Exist
+
+                var checkmid = await getMerchantName(newreq.MerchantID);
+
+                if (checkmid.Result == "NA")
+                {
+                    newreq.MerchantName = payload.MerchantName;
+                }
+                else
+                {
+                    newreq.MerchantName = checkmid.Result;
+                }
+
+
+                if (payload.MerchantNameDifference == true)
+                {
+                    newreq.AcctMerchantNameFlag ="true";
+                    newreq.AcctMNameReason = payload.ReasonForDifferentName;
+                }
+                else
+                {
+                    newreq.AcctMNameReason = string.Empty;
+                    newreq.AcctMerchantNameFlag = "False";
+                }
+
+
+                string op = "New  POS  Request  Submitted with ID :" + TransactionRef + "Submitted Successfully";
+               
+
+
+                var history = new ReqHistory();
+
+                history.ActionDateTime = DateTime.Now;
+                history.Initiator = _configuration["userid"];
+                history.ActionPerformed = "Submit New POS Request";
+                history.ReqId = TransactionRef;
+              
+                    
+               var log = new NewAuditLog();
+
+                log.Activity = "New POS   Request Submitted";
+                log.MakerDate = DateTime.Now;
+                log.MakerID = _configuration["userid"];
+                log.MakerIPAddress = IPAddressUtil.GetLocalIPAddress();
+                log.MakerName = _configuration["MakerName"];
+                log.OldValue = "";
+                log.TransRef = TransactionRef;
+                log.TransDesc = "New  POS Request Submitted by the Processor";
+
+
+                await _context.NewAuditLog.AddAsync(log);
+                await _context.ReqHistory.AddAsync(history);
+                await _context.PosReq.AddAsync(newreq);
+
+                await _context.SaveChangesAsync();
+                await writelog(_configuration["userid"], op);
+
+
+                data.AccountNo = payload.AccountNumber;
+                data.MerchantName = payload.MerchantName;
+                data.MerchantNumber = newreq.MerchantID;
+                data.Status = "Created";
+
+                msg.HasError = false;
+                msg.Message = "Request Submitted Successfully.Please follow up with your Authorizer";
+                msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                msg.Result = data;
+
+                /// send email
+            await  sendText(TransactionRef, newreq.MerchantID, _configuration["NewquestNotification"]);
+
+
+                return msg;
+
+
+            }
+            catch (Exception ex)
+            {
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
+            }
+        }
 
 
         public async Task<ApiResult<CustomerRequestReponse>> GetCustomerRequestStatus(string AccountNo)
@@ -40,10 +302,18 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
 
                 var dataList = new CustomerRequestReponse();
 
+                //AccessDataLayer accessDataLayer = new AccessDataLayer(_context);
+                //DBManager dBManager = new DBManager(_context);
+
+                //var parameters = new List<IDbDataParameter>();
+
+                //parameters.Add(dBManager.CreateParameter("@RoleId",AccountNo, DbType.String));
+                //DataTable menuList = accessDataLayer.
+                //    FetchRolePermissionsByRoleId(parameters.ToArray(), "GetRequestStatus");
+
+
                 var getData =  (from k in  _context.PosReq
                                join a in _context.AcctType on k.AcctType equals a.Acctcode
-                               join s in _context.State on k.StateCode equals s.StateCode
-                               join r in _context.Branch on k.ReqBranch equals r.Branchid.ToString()
                                join p in _context.RequestStatus on k.ProfilingStatus equals p.ReqStatId
 
                                where k.AcctNo == AccountNo
@@ -97,9 +367,144 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
             }
         }
 
+        public async Task<ApiResult<string>> getMerchantName(string MerchantID)
+        {
+
+            var msg = new ApiResult<string>();
+            string temp = "NA";
+
+            try
+            {
+
+                if (MerchantID == "")
+                {
+                    msg.HasError = true;
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = "Merchant Id is a required field.";
+                    return msg;
+                }
+
+                var getRequest = await _context.PosReq.Where(a => a.MerchantID == MerchantID).FirstOrDefaultAsync();
+
+                if (getRequest != null)
+                {
+                    temp = getRequest.MerchantName;
+
+                }
+                
+                msg.HasError = false;
+                msg.Message = "Record Saved Successful";
+                msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                msg.Result = temp;
+                return msg;
+
+            }
+            catch (Exception ex)
+            {
+
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
+            }
+        }
+
+    
+        public async Task writelog(string userid, string op)
+        {
+            try
+            {
+                var ds = new MerchantAcquirerAPI.Data.Models.Domains.AuditLog();
+
+                ds.UserId = userid;
+                ds.OperationsPerformed = op;
+                ds.IpAddress = IPAddressUtil.GetLocalIPAddress();
+                ds.PageVisited = "Mobile";
+                ds.DateAccessed = DateTime.Now;
+               await  _context.AuditLog.AddAsync(ds);
+                await _context.SaveChangesAsync();
+             
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
 
 
-   
+        public async Task<string> sendText(string mm, string mcid,string fileName)
+        {
+            Mailer m = new Mailer(_configuration);
+            string msg = "";
+            string from = _configuration["From"];
+            string to = _configuration["HOPEmail"];
+            string cc = "";
+           // string cc = configuration.ATMPOS + "," + Session["Email"].ToString();
+            string bcc = _configuration["RelationshipOfficeEmail"];
+            string subject = "New Merchant Onboarding Request Awaiting your Review";
+            string dt = DateTime.Now.ToString();
 
+            var rs = await _context.PosReq.Where(a => a.ReqCode == mm).FirstOrDefaultAsync();
+
+              string id = mm;
+            string initiator = _configuration["userid"];
+            string merchant = rs.MerchantName;
+            string acct = rs.AcctNo;
+            string mid = mcid;
+
+           
+            StringBuilder sb = new StringBuilder();
+
+            string fullPath = Directory.GetCurrentDirectory() + _configuration["htmlFolder"] +fileName;
+            
+            StreamReader sr = new StreamReader(fullPath);
+
+            string line = sr.ReadToEnd();
+            sb.Append(line);
+
+            sb.Replace("{id}", id);
+            sb.Replace("{date}", dt);
+            sb.Replace("{initiator}", initiator);
+            sb.Replace("{MerchantName}", merchant);
+            sb.Replace("{AccountNo}", acct);
+            sb.Replace("{MerchantID}", mid);
+
+            string body = sb.ToString();
+            try
+            {
+                // Mailer.SendMailMessage(from, to, bcc, cc, subject, body);
+
+                m.sendMail(to, from, cc, bcc, body, subject, "");
+
+                if (to == string.Empty)
+                {
+                     msg = "Request Submitted Successfully. However,No Active HOP created for your Branch, Please inform your HOP to follow up with Portal Administrator";
+                  
+                }
+                else
+                {
+                     msg = "Request Submitted Successfully. Please follow up with your HOP";
+                  
+                }
+            }
+            catch (Exception ex)
+            {
+
+                if (to == string.Empty)
+                {
+                     msg = "Request Submitted Successfully. However,No Active Authorizer created for your Branch, Please inform your Authorizer to follow up with User Access Management";                  
+                }
+                else
+                {
+                     msg = "Request Submitted Successfully. However,No Active Authorizer created for your Branch, Please inform your Authorizer to follow up with User Access Management ";
+
+                }
+
+                return msg;
+            }
+
+            return msg;
+        }
     }
 }

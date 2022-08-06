@@ -87,7 +87,52 @@ namespace MerchantAcquirerAPI.Services.FileHandler
             }
         }
 
+       
+        public async Task<string> UploadFile(IFormFile FileDetail, string UploadPath)
+        {
+            try
+            {
+                string msg = "";
+                if (FileDetail != null)
+                {
+                    var extension = FileDetail.FileName.Split('.')[1];
+                    int checkExtension = 0;
 
+
+                    if (FileDetail.Length == 0)
+                    {
+                        msg = CommonResponseMessage.NO_FILE_CONTENT;
+                        return msg;
+                    }
+
+
+
+                    var fileName = Guid.NewGuid().ToString();
+                    fileName += "." + extension;
+
+                    string fullPath = Directory.GetCurrentDirectory() + UploadPath + fileName;
+
+
+
+                    // var fullPath = Path.Combine(Directory.GetCurrentDirectory(), UploadPath, fileName);
+                    using (var fileSrteam = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await FileDetail.CopyToAsync(fileSrteam);
+                    }
+
+                    msg = fileName;
+
+                    return msg;
+                }
+
+                return CommonResponseMessage.NO_FILE_UPLOADED;
+            }
+            catch (Exception ex)
+            {
+                var ec = ex;
+                return CommonResponseMessage.FILE_UPLOAD_FAILED + ex.Message;
+            }
+        }
         public async Task<string> AcceptAllUploadFile(IFormFile FileDetail, string UploadPath, int _oneMegaByte, int _fileMaxSize, string extraParameter)
         {
             try

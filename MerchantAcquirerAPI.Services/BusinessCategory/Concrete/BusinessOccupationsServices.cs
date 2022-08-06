@@ -45,6 +45,7 @@ namespace MerchantAcquirerAPI.Services.BusinessCategory.Concrete
                 {
                     msg.HasError = true;            
                     msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", "Business Category");
                 }
                 else if(response.Count==0)
                 {
@@ -98,6 +99,7 @@ namespace MerchantAcquirerAPI.Services.BusinessCategory.Concrete
                 {
                     msg.HasError = true;
                     msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", "Business Occupation");
                 }
                 else if (response.Count == 0)
                 {

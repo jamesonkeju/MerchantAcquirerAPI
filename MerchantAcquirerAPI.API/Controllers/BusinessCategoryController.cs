@@ -50,7 +50,7 @@ namespace MerchantAcquirerAPI.API.Controllers
             }
             catch (Exception ex)
             {
-                var u = new ApiResult<AcctType>
+                var u = new ApiResult<BusinessCategoryList>
                 {
                     HasError = true,
                     Result = null,
@@ -83,7 +83,7 @@ namespace MerchantAcquirerAPI.API.Controllers
             }
             catch (Exception ex)
             {
-                var u = new ApiResult<AcctType>
+                var u = new ApiResult<BusinessOccupation>
                 {
                     HasError = true,
                     Result = null,

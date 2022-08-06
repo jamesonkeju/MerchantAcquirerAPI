@@ -12,6 +12,13 @@ using MerchantAcquirerAPI.Services.Terminal.Interface;
 using MerchantAcquirerAPI.Services.BusinessCategory.Concrete;
 using MerchantAcquirerAPI.Services.CustomerRequest.Interface;
 using MerchantAcquirerAPI.Services.CustomerRequest.Concrete;
+using MerchantAcquirerAPI.Services.MccInformation.Interface;
+using MerchantAcquirerAPI.Services.MccInformation.Concrete;
+using MerchantAcquirerAPI.Services.State.Interface;
+using MerchantAcquirerAPI.Services.State.Concrete;
+using MerchantAcquirerAPI.Services.Network.Interface;
+using MerchantAcquirerAPI.Services.Network.Concrete;
+using MerchantAcquirerAPI.Services.FileHandler;
 
 namespace MerchantAcquirerAPI.Services
 {
@@ -35,10 +42,14 @@ namespace MerchantAcquirerAPI.Services
             services.AddTransient(typeof(DbContextOptions<MerchantAcquirerAPIAppContext>));
             services.AddTransient<IActivityLog, ActivityLogServices>(); 
             services.AddTransient<ICommonRoute, CommonRouteServices>();
-            services.AddTransient<IAccountType, AccountTypeServices>();
+            services.AddTransient< IAccountType, AccountTypeServices >();
             services.AddTransient<IBusinessCategory, BusinessOccupationsServices>();
             services.AddTransient<ITerminal, TerminalServices>();
             services.AddTransient<ICustomerRequest, CustomerRequestServices>();
+            services.AddTransient<IMccInformation, MccInformationServices>();
+            services.AddTransient<IState, StateServices>();
+            services.AddTransient<INetwork, NetworkServices>();
+            services.AddTransient<IFileHandler, FileHandlerServices>();
         }
 
 

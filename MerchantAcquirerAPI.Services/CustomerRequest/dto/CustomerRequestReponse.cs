@@ -10,7 +10,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.dto
 	{
 
 
-		public DateTime ReqDate { get; set; }
+		public DateTime? ReqDate { get; set; }
 
 		public string AcctNo { get; set; }
 		public string AccountClass { get; set; }
@@ -23,9 +23,20 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.dto
 		public string AcctType { get; set; }
 		public string Comment { get; set; }
 		public string CustID { get; set; }
-		public DateTime profillingDate { get; set; }
+		public DateTime? profillingDate { get; set; }
 		public string Status { get; set; }
 
+
+	}
+
+
+	public class POSRequestResponse
+    {
+	  public string AccountNo { get; set; }
+	public string MerchantName { get; set; }
+	public string MerchantNumber { get; set; }
+	public string Status { get; set; }
+	
 
 	}
 }

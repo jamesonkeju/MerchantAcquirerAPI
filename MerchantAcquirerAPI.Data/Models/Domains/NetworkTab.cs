@@ -17,4 +17,17 @@ namespace MerchantAcquirerAPI.Data.Models.Domains
 
 
     }
+
+    public class OperatorList
+    {
+ 
+        public string NetworkOperator { get; set; }
+
+    }
+
+    public class NetworkTypeList
+    {
+        public string NetworkType { get; set; }
+
+    }
 }

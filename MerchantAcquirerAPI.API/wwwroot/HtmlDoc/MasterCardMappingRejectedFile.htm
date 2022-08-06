@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style>
+
+body
+{
+}
+
+
+#emailcss
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	width: 671px;
+	text-align: left;
+	border: 8px solid #015A7C;
+        height: 408px;
+    }
+#emailcss th
+{
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 8px;
+	color: #039;
+        text-align: left;
+    }
+#emailcss td
+{
+	padding: 8px;
+	color: #669;
+}
+#emailcss .odd
+{
+	background: #F5F5F5; 
+	width:20px;
+}
+
+    .style1
+    {
+        font-weight: bold;
+        width:30%;
+    }
+    .style4
+    {
+        font-weight: bold;
+        width: 7%;
+    }
+    .style5
+    {
+        font-weight: bold;
+        width: 7%;
+        height: 34px;
+    }
+    .style6
+    {
+        height: 34px;
+    }
+    </style>
+</head>
+<body>
+<table id="emailcss">
+    <thead>
+    	<tr>
+        	<td scope="col" colspan="2" align="left"><strong>Notification Alert : MasterCard Mapping Request Update</strong></td>
+        </tr>
+    	<tr>
+        	<td scope="col" colspan="2" align="left">Dear&nbsp; Team , </td>
+        </tr>
+    	<tr align="left">
+        	<td scope="col" colspan="2">Your MasterCard Mapping Request was rejected.&nbsp; The details are as follows: </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="odd">
+        	<td class="style4">Subscriber ID</td>
+            <td>{id}</td>
+        </tr>
+
+        <tr>
+        	<td class="style4">TerminalID</td>
+            <td>&nbsp;{tid}</td>
+        </tr>
+        <tr class="odd">
+        	<td class="style4">Card Holder FirstName</td>
+            <td>{fname}</td>
+        </tr>
+        <tr>
+        	<td class="style5">Card Holder LastName</td>
+            <td class="style6">{lname}</td>
+        </tr>
+
+         <tr class="odd">
+        	<td class="style4">ICA</td>
+            <td>{ica}</td>
+        </tr>
+        <tr class="odd">
+            <td class="style4">Comment</td>
+            <td>{comment}</td>
+        </tr>
+
+        <tr class="odd">
+            <td class="style4">Authorized </td>
+            <td>{rejectedBy}</td>
+        </tr>
+        <tr>
+        	<td class="style1" colspan="2">Kindly login to the POS Request Portal to verify the request. Note that you can track your request from the inception to the deployment of POS. <p>
+                    Please do not reply this email.
+                </p>
+                <p>
+        Best regards,
+    </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+</body>
+</html>
+

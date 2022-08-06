@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style>
+
+body
+{
+}
+
+
+#emailcss
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	width: 671px;
+	text-align: left;
+border: 8px solid #015A7C;
+        height: 408px;
+    }
+#emailcss th
+{
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 8px;
+	color: #039;
+        text-align: left;
+    }
+#emailcss td
+{
+	padding: 8px;
+	color: #669;
+}
+#emailcss .odd
+{
+	background: #F5F5F5; 
+	width:20px;
+}
+
+    .style1
+    {
+        font-weight: bold;
+        width:30%;
+    }
+    .style4
+    {
+        font-weight: bold;
+        width: 6%;
+    }
+    </style>
+</head>
+<body>
+<table id="emailcss">
+    <thead>
+    	<tr>
+        	<td scope="col" colspan="2" align="left"><strong>Notification Alert : POS Request 
+                Status</strong></td>
+        </tr>
+    	<tr>
+        	<td scope="col" colspan="2" align="left">Dear  {user} , </td>
+        </tr>
+    	<tr align="left">
+        	<td scope="col" colspan="2">Your POS request has been <strong>REVIEWED AND APPROVED</strong> by 
+        <strong>{approve}</strong> .&nbsp; The details are as follows: </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="odd">
+        	<td class="style4">Request#</td>
+            <td>{id}</td>
+        </tr>
+
+        <tr>
+        	<td class="style4">Terminal ID</td>
+            <td>&nbsp;{Tmid}</td>
+        </tr>
+        <tr class="odd">
+        	<td class="style4">Merchant ID</td>
+            <td>{merchantID}</td>
+        </tr>
+        <tr>
+        	<td class="style4">NUBAN No</td>
+            <td>{acctno}</td>
+        </tr>
+
+         <tr class="odd">
+        	<td class="style4">Merchant Name</td>
+            <td>{MerchantName}</td>
+        </tr>
+
+         <tr>
+        	<td class="style4">Account Name</td>
+            <td>{acctname}</td>
+        </tr>
+
+          <tr>
+        	<td class="style4">ProcessedBy</td>
+            <td>{processor}</td>
+        </tr>
+        <tr>
+        	<td class="style1" colspan="2">Kindly login to the POS Request Portal to track your request. Note that you can track your request from the inception to the deployment of POS. <p>
+                    Please do not reply this email.
+                </p>
+                <p>
+        Best regards,
+    </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+</body>
+</html>
+

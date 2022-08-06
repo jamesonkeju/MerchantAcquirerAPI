@@ -7,7 +7,10 @@ namespace MerchantAcquirerAPI.Utilities.Common
     public class GenericUtil
     {
 
-
+        public static string uniqueid()
+        {
+            return DateTime.Now.ToString("yyyyMMddHHmmssFFF");
+        }
         public static string generatePrimaryId()
         {
             try

@@ -126,6 +126,7 @@ namespace MerchantAcquirerAPI.Data
         public DbSet<Branch> Branch { get; set; }
         public DbSet<BusinessCategory> BusinessCategory { get; set; }
         public DbSet<BusinessOccupation> BusinessOccupation { get; set; }
+        public DbSet<NewAuditLog> NewAuditLog { get; set; }
         public DbSet<DeviceTab> DeviceTab { get; set; }
         public DbSet<MccInfo> MccInfo { get; set; }
         public DbSet<MerchantIDTab> MerchantIDTab { get; set; }
@@ -139,6 +140,7 @@ namespace MerchantAcquirerAPI.Data
         public DbSet<UserInfo> UserInfo { get; set; }
 
         public DbSet<RequestStatus> RequestStatus { get; set; }
+        public DbSet<ReqHistory> ReqHistory { get; set; }
         #endregion
 
 

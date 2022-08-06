@@ -18,7 +18,7 @@ namespace MerchantAcquirerAPI.Services.FileHandler
         Task<string> UploadFileValues(IFormFile FileDetail, string UploadPath, string FileAllowExtension,
             int _oneMegaByte, int _fileMaxSize);
 
-
+        Task<string> UploadFile(IFormFile FileDetail, string UploadPath);
 
     }
 

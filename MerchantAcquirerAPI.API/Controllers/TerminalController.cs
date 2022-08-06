@@ -52,7 +52,7 @@ namespace MerchantAcquirerAPI.API.Controllers
             }
             catch (Exception ex)
             {
-                var u = new ApiResult<AcctType>
+                var u = new ApiResult<TerminalModel>
                 {
                     HasError = true,
                     Result = null,

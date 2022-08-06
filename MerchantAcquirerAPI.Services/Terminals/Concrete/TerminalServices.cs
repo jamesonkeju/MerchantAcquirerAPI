@@ -43,6 +43,7 @@ namespace MerchantAcquirerAPI.Services.Terminal.Concrete
                 {
                     msg.HasError = true;            
                     msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", "Terminal Model ");
                 }
                 else if(response.Count==0)
                 {
@@ -54,12 +55,21 @@ namespace MerchantAcquirerAPI.Services.Terminal.Concrete
                 else
                 {
 
-                  
+                    foreach (var item in response)
+                    {
+                        dataList.Add(new Data.Models.Domains.TerminalModel
+                        {
+                            TermCode = item.TermCode.Trim(),
+                            TermModel = item.TermModel,
+                           
+                        });
+                    }
+
 
                     msg.HasError = false;
                     msg.Message = CommonResponseMessage.FetchSuccessMessage;
                     msg.StatusCode = CommonResponseMessage.MobileSuccessful;
-                    msg.Result = response.ToList();
+                    msg.Result = dataList.ToList();
                 }
 
    
@@ -90,6 +100,7 @@ namespace MerchantAcquirerAPI.Services.Terminal.Concrete
                 {
                     msg.HasError = true;
                     msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", "Terminal Owner ");
                 }
                 else if (response.Count == 0)
                 {
@@ -101,6 +112,16 @@ namespace MerchantAcquirerAPI.Services.Terminal.Concrete
                 else
                 {
 
+
+                    foreach (var item in response)
+                    {
+                        dataList.Add(new Data.Models.Domains.TerminalOwner
+                        {
+                            TermCode = item.TermCode.Trim(),
+                            TermOwner = item.TermOwner,
+
+                        });
+                    }
 
 
                     msg.HasError = false;

@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style>
+
+body
+{
+}
+
+
+#emailcss
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 10px;
+	width: 531px;
+	text-align: left;
+border: 8px solid #015A7C;
+
+}
+#emailcss th
+{
+	font-size: 12px;
+	font-weight: normal;
+	padding: 10px 8px;
+	color: #039;
+        text-align: left;
+    }
+#emailcss td
+{
+	padding: 8px;
+	color: #669;
+}
+#emailcss .odd
+{
+	background: #F5F5F5; 
+	width:20px;
+}
+
+    .style1
+    {
+        font-weight: bold;
+        width:30%;
+    }
+    .style4
+    {
+        font-weight: bold;
+        width: 11%;
+    }
+    .style5
+    {
+        width: 536px;
+    }
+</style>
+</head>
+<body>
+<table id="emailcss">
+    <thead>
+    	<tr>
+        	<th scope="col" colspan="2" align="left"><strong>Notification Alert </strong>:&nbsp;
+                 <b>&nbsp;POS Management Portal</b> </th>
+        </tr>
+    	<tr>
+        	<th scope="col" colspan="2" align="left">Dear&nbsp; <strong>{fname}</strong>,</th>
+        </tr>
+    	<tr align="left">
+        	<th scope="col" colspan="2">This is to inform you that your profile has been Updated on 
+                the Portal as follows:</th>
+        </tr>
+    </thead>
+    <tbody>
+    	<tr class="odd">
+        	<td class="style4">User ID</td>
+            <td class="style5">{id}</td>
+        </tr>
+        <tr>
+        	<td class="style4">FullName</td>
+            <td class="style5">{firstname}</td>
+        </tr>
+        <tr class="odd">
+        	<td class="style4">Branch</td>
+            <td class="style5">{branch}</td>
+        </tr>
+        <tr>
+        	<td class="style4">User Role</td>
+            <td class="style5">{role}</td>
+        </tr>
+        <tr class="odd">
+        	<td class="style4">User Status</td>
+            <td class="style5">{status}</td>
+        </tr>
+        
+        <tr>
+        	<td class="style1" colspan="2">Portal can be accessed via&nbsp; <a href="http://10.0.0.230/PosAcquisition">Pos Portal</a> <p>
+                    Please do not reply this email.
+             
+                <p>
+        Best regards,
+    </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+</body>
+</html>

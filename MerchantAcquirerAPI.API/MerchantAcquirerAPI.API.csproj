@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <Folder Include="Connected Services\" />
+    <Folder Include="wwwroot\NewFolder\NewFolder\" />
     <Folder Include="wwwroot\temp_upload\" />
   </ItemGroup>
 

@@ -20,7 +20,7 @@ namespace MerchantAcquirerAPI.API.Controllers
        
         private IAccountType _accountType;
 
-        public AccountTypeController( IAccountType accountType)
+        public AccountTypeController(IAccountType accountType)
         {
             
             _accountType = accountType;
