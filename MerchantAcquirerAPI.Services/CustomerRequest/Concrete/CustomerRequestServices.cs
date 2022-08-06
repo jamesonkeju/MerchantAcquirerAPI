@@ -371,7 +371,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                                    AcctName = k.AcctName,
                                    ContactName= k.ContactName,
                                    ContactTitle= k.ContactTitle,
-                                   MerchantName= k.MerchantName,
+                                  
                                    MobilePhone= k.MobilePhone,
                                    Comment = k.Comment,
                                    profillingDate = k.profillingDate,
