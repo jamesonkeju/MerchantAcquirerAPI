@@ -19,6 +19,8 @@ using MerchantAcquirerAPI.Services.State.Concrete;
 using MerchantAcquirerAPI.Services.Network.Interface;
 using MerchantAcquirerAPI.Services.Network.Concrete;
 using MerchantAcquirerAPI.Services.FileHandler;
+using MerchantAcquirerAPI.Services.Account.Interface;
+using MerchantAcquirerAPI.Services.Account.Concrete;
 
 namespace MerchantAcquirerAPI.Services
 {
@@ -50,6 +52,7 @@ namespace MerchantAcquirerAPI.Services
             services.AddTransient<IState, StateServices>();
             services.AddTransient<INetwork, NetworkServices>();
             services.AddTransient<IFileHandler, FileHandlerServices>();
+            services.AddTransient<IAccount, AccountServices>();
         }
 
 

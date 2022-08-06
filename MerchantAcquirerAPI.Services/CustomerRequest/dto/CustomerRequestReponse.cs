@@ -16,6 +16,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.dto
 		public string AccountClass { get; set; }
 		public string AcctName { get; set; }
 		public string MerchantID { get; set; }
+		public string TerminalNo { get; set; }
 		public string MerchantName { get; set; }
 		public string ContactTitle { get; set; }
 		public string ContactName { get; set; }
@@ -35,6 +36,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.dto
 	  public string AccountNo { get; set; }
 	public string MerchantName { get; set; }
 	public string MerchantNumber { get; set; }
+    public string TerminalID { get; set; }
 	public string Status { get; set; }
 	
 

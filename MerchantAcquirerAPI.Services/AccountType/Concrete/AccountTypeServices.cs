@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 
 namespace MerchantAcquirerAPI.Services.AccountType.Concrete
 {
-     public  class AccountTypeServices : IAccountType
+    
+    public  class AccountTypeServices : IAccountType
     {
         private MerchantAcquirerAPIAppContext _context;
         private IActivityLog _activityLogService;

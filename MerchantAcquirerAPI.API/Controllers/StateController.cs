@@ -1,4 +1,5 @@
 ﻿using MerchantAcquirerAPI.API.Controllers;
+using MerchantAcquirerAPI.API.Shared;
 using MerchantAcquirerAPI.Data;
 using MerchantAcquirerAPI.Data.Models.Domains;
 using MerchantAcquirerAPI.Services.AccountType.Concrete;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MerchantAcquirerAPI.API.Controllers
 {
-
+    [CustomRoleFilter]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class StateController : BaseController

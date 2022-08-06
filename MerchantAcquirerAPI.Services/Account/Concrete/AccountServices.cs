@@ -16,6 +16,8 @@ using MerchantAcquirerAPI.Services.DataAccess;
 using MerchantAcquirerAPI.Utilities.Common;
 using MerchantAcquirerAPI.Data.Models.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using MerchantAcquirerAPI.Services.Account.DTO;
+using MerchantAcquirerAPI.Data.Models.Domains;
 
 namespace MerchantAcquirerAPI.Services.Account.Concrete
 {
@@ -31,25 +33,19 @@ namespace MerchantAcquirerAPI.Services.Account.Concrete
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         
-        public AccountServices(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            RoleManager<ApplicationRole> roleManager, IConfiguration configuration,
+        public AccountServices(IConfiguration configuration,
          
-            MerchantAcquirerAPIAppContext context, IActivityLog activityRepo, IHttpContextAccessor httpContextAccessor)
+            MerchantAcquirerAPIAppContext context)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+
+
             _configuration = configuration;
-            _roleManager = roleManager;
-           
             _context = context;
-            _roleManager = roleManager;
-            _activityRepo = activityRepo;
-            _httpContextAccessor = httpContextAccessor;
+       
         }
 
 
-        public async Task<ApiResult<Utilities.LDAPModel.CustomerDetail>> AccountValidation(string AccountNo)
+        public async Task<ApiResult<Utilities.LDAPModel.CustomerDetail>> AccountValidation(string? AccountNo)
         {
             var customerInfo = new Utilities.LDAPModel.CustomerDetail();
             var msg = new ApiResult<Utilities.LDAPModel.CustomerDetail>();
@@ -62,6 +58,24 @@ namespace MerchantAcquirerAPI.Services.Account.Concrete
                     msg.StatusCode = CommonResponseMessage.MobileFailed;
                     msg.Message = "Account Number is a required field. Please supply Merchant Account Number";
                     return msg;
+                }
+
+
+
+
+                  if(_configuration["CheckExistingAccount"] =="YES")
+                {
+
+                    var checkExistingRecord = await _context.PosReq.Where(a => a.AcctNo == AccountNo).ToListAsync();
+
+                    if (checkExistingRecord.Count > 0)
+                    {
+                        msg.HasError = true;
+                        msg.StatusCode = CommonResponseMessage.MobileFailed;
+                        msg.Message = "An existng account number was found.";
+                        return msg;
+                    }
+
                 }
 
 
@@ -99,6 +113,53 @@ namespace MerchantAcquirerAPI.Services.Account.Concrete
             }
         }
 
-     
+
+        public string tokenEngine()
+        {
+            byte[] time = BitConverter.GetBytes(DateTime.UtcNow.ToBinary());
+            byte[] key = Guid.NewGuid().ToByteArray();
+            string token = Convert.ToBase64String(time.Concat(key).ToArray());
+
+            return token;
+        }
+        public async Task<ApiResult<Token>> AccessToken()
+        {
+            var msg = new ApiResult<Token>();
+
+            try
+            {
+                // generate new record 
+                var token = new Token();
+
+                string tokenValue = tokenEngine();
+                DateTime expiredDate = DateTime.Now.AddHours(Convert.ToInt32(_configuration["TokenExpireDuration"]));
+
+                var createASession = new AccessToken
+                {
+                    DateCreated = DateTime.Now,
+                    TokenKey = tokenValue,
+                    ExpireDate = expiredDate
+                };
+
+                await _context.AccessToken.AddAsync(createASession);
+              await  _context.SaveChangesAsync();
+
+                token.AccessToken = tokenValue;
+                token.ExpireDate = expiredDate;
+
+                msg.HasError = false;
+                msg.Message = CommonResponseMessage.FetchSuccessMessage;
+                msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                msg.Result = token;
+                return msg;
+            }
+            catch(Exception ex)
+            {
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
+            }
+        }
     }
 }

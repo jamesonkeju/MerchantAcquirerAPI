@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MerchantAcquirerAPI.Data.Models.ViewModel;
+using MerchantAcquirerAPI.Services.Account.DTO;
 using MerchantAcquirerAPI.Utilities.Common;
 
 namespace MerchantAcquirerAPI.Services.Account.Interface
@@ -12,8 +13,8 @@ namespace MerchantAcquirerAPI.Services.Account.Interface
     {
 
         Task<ApiResult<Utilities.LDAPModel.CustomerDetail>> AccountValidation(string AccountNo);
+        Task<ApiResult<Token>> AccessToken();
 
-        
 
         ////Task<MessageOut> activeuser(string userid);
         ////string getHOPEmailAddress(string branchid);

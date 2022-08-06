@@ -1,10 +1,13 @@
 ﻿using MerchantAcquirerAPI.API.Controllers;
-using MerchantAcquirerAPI.API.Shared;
 using MerchantAcquirerAPI.Data;
 using MerchantAcquirerAPI.Data.Models.Domains;
+using MerchantAcquirerAPI.Data.Models.ViewModel;
+using MerchantAcquirerAPI.Services.Account.DTO;
+using MerchantAcquirerAPI.Services.Account.Interface;
 using MerchantAcquirerAPI.Services.AccountType.Concrete;
 using MerchantAcquirerAPI.Services.AccountType.Interface;
-using MerchantAcquirerAPI.Services.State.Interface;
+using MerchantAcquirerAPI.Services.BusinessCategory.Interface;
+using MerchantAcquirerAPI.Services.CustomerRequest.Interface;
 using MerchantAcquirerAPI.Utilities.Common;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,42 +17,41 @@ using System.Threading.Tasks;
 
 namespace MerchantAcquirerAPI.API.Controllers
 {
-    [CustomRoleFilter]
+
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class LagController : BaseController
+    public class GenerateTokenController : BaseController
     {
-       
-        private IState _state;
 
-        public LagController( IState  state)
+        private IAccount _account;
+
+        public GenerateTokenController(IAccount account)
         {
 
-            _state = state;
+            _account = account;
         }
 
-           /// <summary>
-           /// Get all LGA by state Code
-           /// </summary>
-           /// <param name="StateCode"></param>
-           /// <returns></returns>
-     
+        /// <summary>
+        /// Generate System token. The token will expire after 24 hours of generation
+        /// </summary>
+        /// <returns></returns>
+
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResult<Lga>), 200)]
+        [ProducesResponseType(typeof(ApiResult<Token>), 200)]
         [ProducesResponseType(typeof(IDictionary<string, string>), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetLGAByState(string StateCode)
+        public async Task<IActionResult> AccessToken()
         {
 
             try
             {
-                var data = await _state.GetLGAByState(StateCode);
+                var data = await _account.AccessToken();
                 return Ok(data);
 
             }
             catch (Exception ex)
             {
-                var u = new ApiResult<Lga>
+                var u = new ApiResult<Token>
                 {
                     HasError = true,
                     Result = null,
@@ -60,6 +62,5 @@ namespace MerchantAcquirerAPI.API.Controllers
             }
 
         }
-
     }
 }

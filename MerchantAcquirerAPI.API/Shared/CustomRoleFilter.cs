@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MerchantAcquirerAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -18,15 +19,15 @@ namespace MerchantAcquirerAPI.API.Shared
         private static string _secretKey;
         private static bool _isLocal = Convert.ToBoolean(ConfigHelpers.AppSetting("App", "IsLocal"));
         private static string _CheckToken = ConfigHelpers.AppSetting("App", "CheckToken");
+
         private readonly string session_token = "";
         public string UserRole { get; set; }
-
-
+       
         public override async void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            
 
-            if (_CheckToken == "YES")
-            {
+           
                 string jwt_token = "";
                 try
                 {
@@ -39,7 +40,7 @@ namespace MerchantAcquirerAPI.API.Shared
                         return;
                     }
 
-                    var isValid = ValidateToken(jwt_token);
+                    var isValid = ValidateAccessToken(jwt_token);
 
 
                     if (!isValid)
@@ -55,7 +56,7 @@ namespace MerchantAcquirerAPI.API.Shared
                     filterContext.Result = new UnauthorizedObjectResult(ex.Message);
                     return;
                 }
-            }
+            
             
         }
 
@@ -81,6 +82,33 @@ namespace MerchantAcquirerAPI.API.Shared
                 var principal = tokenHandler.ValidateToken(token, parameters, out var securityToken);
                 var claimValue = principal.Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
                 return !string.IsNullOrWhiteSpace(claimValue);
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+                // do nothing if jwt validation fails
+                // token has expire
+            }
+        }
+
+        public  bool ValidateAccessToken(string token)
+        {
+            Data.MerchantAcquirerAPIAppContext _context = new MerchantAcquirerAPIAppContext();
+            try
+            {
+
+                var checkKey = _context.AccessToken.Where(a => a.TokenKey == token).FirstOrDefault();
+
+                if(checkKey.ExpireDate> DateTime.Now)
+                {
+                    return true;
+
+                }
+                else
+                {
+                    return false;
+                }
 
             }
             catch (Exception ex)

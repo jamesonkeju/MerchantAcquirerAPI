@@ -1,6 +1,8 @@
 ﻿using MerchantAcquirerAPI.API.Controllers;
+using MerchantAcquirerAPI.API.Shared;
 using MerchantAcquirerAPI.Data;
 using MerchantAcquirerAPI.Data.Models.Domains;
+using MerchantAcquirerAPI.Services.Account.Interface;
 using MerchantAcquirerAPI.Services.AccountType.Concrete;
 using MerchantAcquirerAPI.Services.AccountType.Interface;
 using MerchantAcquirerAPI.Services.CustomerRequest.dto;
@@ -16,26 +18,28 @@ using System.Threading.Tasks;
 
 namespace MerchantAcquirerAPI.API.Controllers
 {
-
+    //[CustomRoleFilter]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class CustomerRequestController : BaseController
     {
         private IConfiguration _configuration;
+        private IAccount _account;
         private ICustomerRequest _customerRequest;
         private IFileHandler _fileHandler;
 
-        public CustomerRequestController(ICustomerRequest  customerRequest, IFileHandler fileHandler, IConfiguration configuration )
+        public CustomerRequestController(ICustomerRequest  customerRequest, 
+            IFileHandler fileHandler, IConfiguration configuration,IAccount  account )
         {
-
             _customerRequest = customerRequest;
             _fileHandler = fileHandler;
             _configuration = configuration;
+            _account = account;
         }
 
 
         /// <summary>
-        /// Fetch Customer POS request status by account number 
+        /// Fetch Customer POS requests by account number 
         /// </summary>
         /// <param name="AccountNo"></param>
         /// <returns></returns>
@@ -43,12 +47,45 @@ namespace MerchantAcquirerAPI.API.Controllers
         [ProducesResponseType(typeof(ApiResult<CustomerRequestReponse>), 200)]
         [ProducesResponseType(typeof(IDictionary<string, string>), 400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetCustomerRequestStatus(string AccountNo)
+        public async Task<IActionResult> GetCustomerRequestByAccountNo(string AccountNo)
         {
 
             try
             {
-                var data = await _customerRequest.GetCustomerRequestStatus(AccountNo);
+                var data = await _customerRequest.GetCustomerRequestByAccountNo(AccountNo);
+                return Ok(data);
+
+            }
+            catch (Exception ex)
+            {
+                var u = new ApiResult<CustomerRequestReponse>
+                {
+                    HasError = true,
+                    Result = null,
+                    Message = ex.Message,
+                    StatusCode = CommonResponseMessage.FailStatusCode
+                };
+                return BadRequest(u);
+            }
+
+        }
+
+
+        /// <summary>
+        /// Fetch Customer POS requests by  MerchantId 
+        /// </summary>
+        /// <param name="MerchantId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResult<CustomerRequestReponse>), 200)]
+        [ProducesResponseType(typeof(IDictionary<string, string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetPOSRequestByMerchantId(string MerchantId)
+        {
+
+            try
+            {
+                var data = await _customerRequest.GetPOSRequestByMerchantId(MerchantId);
                 return Ok(data);
 
             }
@@ -68,7 +105,111 @@ namespace MerchantAcquirerAPI.API.Controllers
 
 
 
-        
+
+        /// <summary>
+        /// Fetch Customer POS requests status by account no 
+        /// </summary>
+        /// <param name="accountNo"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResult<POSRequestResponse>), 200)]
+        [ProducesResponseType(typeof(IDictionary<string, string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> CheckPOSRequestStatus(string accountNo)
+        {
+
+            try
+            {
+                var data = await _customerRequest.CheckPOSRequestStatus(accountNo);
+                return Ok(data);
+
+            }
+            catch (Exception ex)
+            {
+                var u = new ApiResult<POSRequestResponse>
+                {
+                    HasError = true,
+                    Result = null,
+                    Message = ex.Message,
+                    StatusCode = CommonResponseMessage.FailStatusCode
+                };
+                return BadRequest(u);
+            }
+
+        }
+
+
+        /// <summary>
+        /// Fetch Customer POS requests by terminal number 
+        /// </summary>
+        /// <param name="Terminal"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResult<CustomerRequestReponse>), 200)]
+        [ProducesResponseType(typeof(IDictionary<string, string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetPOSRequestByTerminalid(string Terminal)
+        {
+
+            try
+            {
+                var data = await _customerRequest.GetPOSRequestByTerminalid(Terminal);
+                return Ok(data);
+
+            }
+            catch (Exception ex)
+            {
+                var u = new ApiResult<CustomerRequestReponse>
+                {
+                    HasError = true,
+                    Result = null,
+                    Message = ex.Message,
+                    StatusCode = CommonResponseMessage.FailStatusCode
+                };
+                return BadRequest(u);
+            }
+
+        }
+
+        /// <summary>
+        /// This method will validate the customer's account number
+        /// </summary>
+        /// <param name="AccountNo"></param>
+        /// <returns></returns>
+
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResult<Utilities.LDAPModel.CustomerDetail>), 200)]
+        [ProducesResponseType(typeof(IDictionary<string, string>), 400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> AccountValidation(string? AccountNo)
+        {
+
+            try
+            {
+                var data = await _account.AccountValidation(AccountNo);
+                return Ok(data);
+
+            }
+            catch (Exception ex)
+            {
+                var u = new ApiResult<Utilities.LDAPModel.CustomerDetail>
+                {
+                    HasError = true,
+                    Result = null,
+                    Message = ex.Message,
+                    StatusCode = CommonResponseMessage.FailStatusCode
+                };
+                return BadRequest(u);
+            }
+
+        }
+
+
+        /// <summary>
+        /// This method will be used to create a POS request. All required fields should be supplied 
+        /// </summary>
+        /// <param name="payload"></param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(ApiResult<POSRequestResponse>), 200)]
         [ProducesResponseType(typeof(IDictionary<string, string>), 400)]

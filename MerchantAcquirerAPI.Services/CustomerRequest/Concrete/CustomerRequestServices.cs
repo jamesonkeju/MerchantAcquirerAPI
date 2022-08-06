@@ -42,9 +42,9 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
         }
 
 
-        public async Task<ApiResult<string>> GetNewMID(string AccountNo, string address)
+        public  ApiResult<string> GetNewMID(string AccountNo, string address)
         {
-
+            MerchantAcquirerAPIAppContext _contextNew = new MerchantAcquirerAPIAppContext();
             var msg = new ApiResult<string>();
             string temp = "";
 
@@ -68,7 +68,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 }
 
 
-                var getRequest = await _context.PosReq.Where(a => a.AcctNo == AccountNo && a.PhyAddress == address).FirstOrDefaultAsync();
+                var getRequest = _contextNew.PosReq.Where(a => a.AcctNo == AccountNo && a.PhyAddress == address).FirstOrDefault();
 
                 if (getRequest != null)
                 {
@@ -79,7 +79,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 else
                 {
 
-                    var rstep = await _context.MerchantIDTab.FirstOrDefaultAsync();
+                    var rstep = _contextNew.MerchantIDTab.FirstOrDefault();
 
                     int lastid = Convert.ToInt32(rstep.LastMid);
                     int newid = lastid + 1;
@@ -88,7 +88,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                     // Update last record
                     rstep.LastMid = newid.ToString();
                     rstep.DateLastGen = DateTime.Now;
-                    await _context.SaveChangesAsync();
+                    _contextNew.SaveChanges();
 
 
                     string bracode = AccountNo.Substring(0, 3);
@@ -117,12 +117,57 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
             }
         }
 
+
+        public async Task<string>  generateTerminalNo()
+        {
+            LDAP lp = new LDAP(_configuration);
+            bool checker = true;
+            string tempgenerateTerminal = "";
+            string generateTerminal = "";
+            try
+            {
+                
+                while (checker == true)
+                {
+                     generateTerminal = lp.GenerateTerminalId();
+
+                     tempgenerateTerminal = generateTerminal.Substring(0, 4);
+
+                    var checkDuplicate = await _context.NewTerminalTemp.
+                                                                Where(a => a.TerminalNumber == tempgenerateTerminal).ToListAsync();
+
+                    if (checkDuplicate.Count == 0)
+                    {
+                        var insertData = new NewTerminalTemp
+                        {
+                            LastGeneratedDate = DateTime.Now,
+                            TerminalNumber = tempgenerateTerminal.ToUpper()
+                        };
+
+                        checker = true;
+                        break;
+                    }
+                }
+
+                return tempgenerateTerminal.ToUpper();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
         public async Task<ApiResult<POSRequestResponse>> CreatePOSRequest(POSRequest payload, string AppFileName, string AcceptanceFileName)
         {
             string TransactionRef = GenericUtil.uniqueid();
             var msg = new ApiResult<POSRequestResponse>();
             LDAP lp = new LDAP(_configuration);
 
+            string temp = _configuration["TermPrefix"];
+
+            string terminalNo = await generateTerminalNo();
+            string NewTerminalNumber = temp + terminalNo;
             var data = new POSRequestResponse();
             try
             {
@@ -145,7 +190,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 newreq.TermCode = payload.TermCode;
                 newreq.ReqDate = DateTime.Now;
                 newreq.ReqBranch = _configuration["Branch"];
-                newreq.ReqStatId = 1;
+                newreq.ReqStatId = Convert.ToInt32(_configuration["RequestStatusCode"]);
                 newreq.SlipHeader = payload.MerchantAddress;
                 newreq.UserId = _configuration["userId"];
                 newreq.PhyAddress = payload.PhysicalAddress;
@@ -189,8 +234,8 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 newreq.ApplicationForm1 = AppFileName;
                 newreq.ApplicationForm2 = AcceptanceFileName;
 
-                string path1 = _configuration["xxxx"] + AppFileName;
-                string path2 = _configuration["xxxx"] + AcceptanceFileName;
+                string path1 = _configuration["upload"] + AppFileName;
+                string path2 = _configuration["upload"] + AcceptanceFileName;
 
                 newreq.SiteVisitationDoc = "";
                 newreq.AgreementDoc = "";
@@ -199,7 +244,7 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 newreq.EmailAlerts = payload.ReceiveEmailAlerts == true ? "Y" : "N";
                 newreq.CustID = payload.CustomerID;
 
-                var  mcid = await GetNewMID(payload.AccountNumber,payload.PhysicalAddress);
+                var  mcid =  GetNewMID(payload.AccountNumber,payload.PhysicalAddress);
 
                 newreq.MerchantID = mcid.Result.Trim();
 
@@ -234,6 +279,12 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 }
 
 
+                newreq.TerminalID = NewTerminalNumber;
+
+                newreq.profillingDate = DateTime.Now;
+                newreq.profilingBy = _configuration["ProfileStatus"];
+                newreq.EbizComment = "Request carrried out on the mobile app.";
+                newreq.EbizAction = "Request Accepted";
                 string op = "New  POS  Request  Submitted with ID :" + TransactionRef + "Submitted Successfully";
                
 
@@ -269,15 +320,17 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                 data.AccountNo = payload.AccountNumber;
                 data.MerchantName = payload.MerchantName;
                 data.MerchantNumber = newreq.MerchantID;
+                data.TerminalID = newreq.TerminalID;
                 data.Status = "Created";
 
                 msg.HasError = false;
-                msg.Message = "Request Submitted Successfully.Please follow up with your Authorizer";
+                msg.Message = "Request Submitted Successfully.";
                 msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+               
                 msg.Result = data;
 
                 /// send email
-            await  sendText(TransactionRef, newreq.MerchantID, _configuration["NewquestNotification"]);
+         //   await  sendText(TransactionRef, newreq.MerchantID, _configuration["NewquestNotification"]);
 
 
                 return msg;
@@ -294,22 +347,15 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
         }
 
 
-        public async Task<ApiResult<CustomerRequestReponse>> GetCustomerRequestStatus(string AccountNo)
+        public async Task<ApiResult<List<CustomerRequestReponse>>> GetCustomerRequestByAccountNo(string AccountNo)
         {
-            var msg = new ApiResult<CustomerRequestReponse>();
+            var msg = new ApiResult<List<CustomerRequestReponse>>();
             try
             {
 
-                var dataList = new CustomerRequestReponse();
+                var dataList = new List<CustomerRequestReponse>();
 
-                //AccessDataLayer accessDataLayer = new AccessDataLayer(_context);
-                //DBManager dBManager = new DBManager(_context);
-
-                //var parameters = new List<IDbDataParameter>();
-
-                //parameters.Add(dBManager.CreateParameter("@RoleId",AccountNo, DbType.String));
-                //DataTable menuList = accessDataLayer.
-                //    FetchRolePermissionsByRoleId(parameters.ToArray(), "GetRequestStatus");
+               
 
 
                 var getData =  (from k in  _context.PosReq
@@ -333,21 +379,21 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
                                    CustID= k.CustID,
                                    Status = p.ReqStatus,
                                    ReqDate= k.ReqDate,
-
-                               }).FirstOrDefault();
+                                   TerminalNo = k.TerminalID == null || k.TerminalID == "" ? "N/A" : k.TerminalID,
+                                   MerchantName = k.MerchantName == null || k.MerchantName == "" ? "N/A" : k.MerchantName,
+                               }).ToList();
 
 
 
 
                 if (getData == null)
                 {
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", " account data ");
                     msg.HasError = true;
                     msg.StatusCode = CommonResponseMessage.MobileFailed;
                 }
                 else
                 {
-
-
                     msg.HasError = false;
                     msg.Message = CommonResponseMessage.FetchSuccessMessage;
                     msg.StatusCode = CommonResponseMessage.MobileSuccessful;
@@ -367,7 +413,141 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
             }
         }
 
-        public async Task<ApiResult<string>> getMerchantName(string MerchantID)
+
+        public async Task<ApiResult<List<CustomerRequestReponse>>> GetPOSRequestByTerminalid(string TerminalId)
+        {
+            var msg = new ApiResult<List<CustomerRequestReponse>>();
+            try
+            {
+
+                var dataList = new List<CustomerRequestReponse>();
+
+
+
+
+                var getData = (from k in _context.PosReq
+                               join a in _context.AcctType on k.AcctType equals a.Acctcode
+                               join p in _context.RequestStatus on k.ProfilingStatus equals p.ReqStatId
+
+                               where k.TerminalID == TerminalId
+                               select new CustomerRequestReponse
+                               {
+                                   AccountClass = k.AccountClass,
+                                   AcctNo = k.AcctNo,
+                                   AcctType = a.AcctDesc,
+                                   AcctName = k.AcctName,
+                                   ContactName = k.ContactName,
+                                   ContactTitle = k.ContactTitle,
+                             
+                                   MobilePhone = k.MobilePhone,
+                                   Comment = k.Comment,
+                                   profillingDate = k.profillingDate,
+                                   MerchantID = k.MerchantID,
+                                   CustID = k.CustID,
+                                   Status = p.ReqStatus,
+                                   ReqDate = k.ReqDate,
+                                   TerminalNo = k.TerminalID == null || k.TerminalID == "" ? "N/A" : k.TerminalID,
+                                   MerchantName = k.MerchantName == null || k.MerchantName == "" ? "N/A" : k.MerchantName,
+
+                               }).ToList();
+
+
+
+
+                if (getData == null)
+                {
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", " account data ");
+                    msg.HasError = true;
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                }
+                else
+                {
+                    msg.HasError = false;
+                    msg.Message = CommonResponseMessage.FetchSuccessMessage;
+                    msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                    msg.Result = getData;
+                }
+
+
+                return msg;
+
+            }
+            catch (Exception ex)
+            {
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
+            }
+
+        }
+
+            public async Task<ApiResult<List<CustomerRequestReponse>>> GetPOSRequestByMerchantId(string MerchantId)
+            {
+                var msg = new ApiResult<List<CustomerRequestReponse>>();
+                try
+                {
+
+                    var dataList = new List<CustomerRequestReponse>();
+
+
+
+
+                    var getData = (from k in _context.PosReq
+                                   join a in _context.AcctType on k.AcctType equals a.Acctcode
+                                   join p in _context.RequestStatus on k.ProfilingStatus equals p.ReqStatId
+
+                                   where k.MerchantID == MerchantId
+                                   select new CustomerRequestReponse
+                                   {
+                                       AccountClass = k.AccountClass,
+                                       AcctNo = k.AcctNo,
+                                       AcctType = a.AcctDesc,
+                                       AcctName = k.AcctName,
+                                       ContactName = k.ContactName,
+                                       ContactTitle = k.ContactTitle,
+                                       MerchantName = k.MerchantName,
+                                       MobilePhone = k.MobilePhone,
+                                       Comment = k.Comment,
+                                       profillingDate = k.profillingDate,
+                                       MerchantID = k.MerchantID,
+                                       CustID = k.CustID,
+                                       Status = p.ReqStatus,
+                                       ReqDate = k.ReqDate,
+                                       TerminalNo=k.TerminalID
+
+                                   }).ToList();
+
+
+
+
+                    if (getData == null)
+                    {
+                        msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", " account data ");
+                        msg.HasError = true;
+                        msg.StatusCode = CommonResponseMessage.MobileFailed;
+                    }
+                    else
+                    {
+                        msg.HasError = false;
+                        msg.Message = CommonResponseMessage.FetchSuccessMessage;
+                        msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                        msg.Result = getData;
+                    }
+
+
+                    return msg;
+
+                }
+                catch (Exception ex)
+                {
+                    msg.Message = CommonResponseMessage.InternalError;
+                    msg.HasError = true;
+                    msg.Result = null;
+                    return msg;
+                }
+            }
+            public async Task<ApiResult<string>> getMerchantName(string MerchantID)
         {
 
             var msg = new ApiResult<string>();
@@ -505,6 +685,65 @@ namespace MerchantAcquirerAPI.Services.CustomerRequest.Concrete
             }
 
             return msg;
+        }
+
+       
+
+        public async Task<ApiResult<List<POSRequestResponse>>> CheckPOSRequestStatus(string AccountNo)
+        {
+            var msg = new ApiResult<List<POSRequestResponse>>();
+            try
+            {
+
+                var dataList = new List<POSRequestResponse>();
+
+
+
+
+                var getData = (from k in _context.PosReq
+                               join a in _context.AcctType on k.AcctType equals a.Acctcode
+                               join p in _context.RequestStatus on k.ProfilingStatus equals p.ReqStatId
+
+                               where k.AcctNo == AccountNo
+                               select new POSRequestResponse
+                               {
+                                   AccountNo = k.AcctNo,
+                                   MerchantNumber = k.MobilePhone,
+                                   TerminalID= k.TerminalID ==null || k.TerminalID == ""  ? "N/A" : k.TerminalID,
+                                   MerchantName = k.MerchantName == null || k.MerchantName == "" ? "N/A" : k.MerchantName,
+                                   Status = p.ReqStatus,
+
+
+                               }).ToList();
+
+
+
+
+                if (getData == null)
+                {
+                    msg.Message = CommonResponseMessage.RecordNotExisting.Replace("{0}", " account data ");
+                    msg.HasError = true;
+                    msg.StatusCode = CommonResponseMessage.MobileFailed;
+                }
+                else
+                {
+                    msg.HasError = false;
+                    msg.Message = CommonResponseMessage.FetchSuccessMessage;
+                    msg.StatusCode = CommonResponseMessage.MobileSuccessful;
+                    msg.Result = getData;
+                }
+
+
+                return msg;
+
+            }
+            catch (Exception ex)
+            {
+                msg.Message = CommonResponseMessage.InternalError;
+                msg.HasError = true;
+                msg.Result = null;
+                return msg;
+            }
         }
     }
 }

@@ -131,7 +131,7 @@ namespace MerchantAcquirerAPI.Data
         public DbSet<MccInfo> MccInfo { get; set; }
         public DbSet<MerchantIDTab> MerchantIDTab { get; set; }
         public DbSet<NetworkTab> NetworkTab { get; set; }
-
+        public DbSet<NewTerminalTemp> NewTerminalTemp { get; set; }
         public DbSet<PosReq> PosReq { get; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Lga> LGA { get; set; }
@@ -141,6 +141,8 @@ namespace MerchantAcquirerAPI.Data
 
         public DbSet<RequestStatus> RequestStatus { get; set; }
         public DbSet<ReqHistory> ReqHistory { get; set; }
+         public DbSet<AccessToken> AccessToken { get; set; }
+
         #endregion
 
 
